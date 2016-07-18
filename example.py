@@ -1,3 +1,4 @@
+from __future__ import print_function
 # encoding: utf-8
 
 from flask import Flask, render_template
@@ -439,6 +440,15 @@ def main():
                 poke.Latitude, poke.Longitude = transform_from_wgs_to_gcj(Location(poke.Latitude, poke.Longitude))
             pokemons.append([poke.pokemon.PokemonId, label, poke.Latitude, poke.Longitude])
 
+        #Avoid same gym displayed more than once
+        gymseen = set([])
+        for gym in gyms:
+            gymhash = str(gym[1]) + ',' + str(gym[2])
+            if (hash in gymseen):
+                gyms.remove(gym)
+            else:
+                gymseen.add(gymhash)
+        
         #Scan location math
         if (-steplimit/2 < x <= steplimit/2) and (-steplimit/2 < y <= steplimit/2):
             set_location_coords((x * 0.0025) + deflat, (y * 0.0025 ) + deflng, 0)
