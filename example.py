@@ -395,6 +395,7 @@ def main():
     dx  = 0
     dy  = -1
     while steps < steplimit**2:
+        tempmons = []
         debug("looping: step {} of {}".format(steps, steplimit**2))
         original_lat = FLOAT_LAT
         original_long = FLOAT_LONG
@@ -438,7 +439,11 @@ def main():
             label = '<b>%s</b> [%s remaining]' % (pokemonsJSON[poke.pokemon.PokemonId - 1]['Name'], left)
             if args.china:
                 poke.Latitude, poke.Longitude = transform_from_wgs_to_gcj(Location(poke.Latitude, poke.Longitude))
-            pokemons.append([poke.pokemon.PokemonId, label, poke.Latitude, poke.Longitude])
+            tempmons.append([poke.pokemon.PokemonId, label, poke.Latitude, poke.Longitude])
+
+        if len(pokemons)>=steplimit**2:
+            pokemons.pop(0)
+        pokemons.append(tempmons)
 
         #Avoid same gym displayed more than once
         gymseen = set([])
@@ -504,18 +509,19 @@ app = create_app()
 @app.route('/')
 def fullmap():
     pokeMarkers = []
-    for pokemon in pokemons:
-        currLat, currLon = pokemon[-2], pokemon[-1]
-        imgnum = str(pokemon[0]);
-        if len(imgnum) <= 2: imgnum = '0' + imgnum
-        if len(imgnum) <= 2: imgnum = '0' + imgnum
-        pokeMarkers.append(
-            {
-                'icon': 'static/icons/'+str(pokemon[0])+'.png',
-                'lat': currLat,
-                'lng': currLon,
-                'infobox': '<div style=\'position:float; top:0;left:0;\'><small><a href=\'http://www.pokemon.com/us/pokedex/'+str(pokemon[0])+'\' target=\'_blank\' title=\'View in Pokedex\'>#'+str(pokemon[0])+'</a></small></div><center>'+pokemon[1].replace('0 hours ','').replace('0 minutes ','')+'</center><img height=\'100\' width=\'100\' src=\'http://assets.pokemon.com/assets/cms2/img/pokedex/full/'+imgnum+'.png\'>'
-            })
+    for smlist in pokemons:
+        for pokemon in smlist:
+            currLat, currLon = pokemon[-2], pokemon[-1]
+            imgnum = str(pokemon[0]);
+            if len(imgnum) <= 2: imgnum = '0' + imgnum
+            if len(imgnum) <= 2: imgnum = '0' + imgnum
+            pokeMarkers.append(
+                {
+                    'icon': 'static/icons/'+str(pokemon[0])+'.png',
+                    'lat': currLat,
+                    'lng': currLon,
+                    'infobox': '<div style=\'position:float; top:0;left:0;\'><small><a href=\'http://www.pokemon.com/us/pokedex/'+str(pokemon[0])+'\' target=\'_blank\' title=\'View in Pokedex\'>#'+str(pokemon[0])+'</a></small></div><center>'+pokemon[1].replace('0 hours ','').replace('0 minutes ','')+'</center><img height=\'100\' width=\'100\' src=\'http://assets.pokemon.com/assets/cms2/img/pokedex/full/'+imgnum+'.png\'>'
+                })
     for gym in gyms:
         if gym[0] == 0: color = "white"
         if gym[0] == 1: color = "rgba(0, 0, 256, .1)"
