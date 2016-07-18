@@ -394,7 +394,6 @@ def main():
     y   = 0
     dx  = 0
     dy  = -1
-    newpokemons = []
     while steps < steplimit**2:
         debug("looping: step {} of {}".format(steps, steplimit**2))
         original_lat = FLOAT_LAT
@@ -439,11 +438,7 @@ def main():
             label = '<b>%s</b> [%s remaining]' % (pokemonsJSON[poke.pokemon.PokemonId - 1]['Name'], left)
             if args.china:
                 poke.Latitude, poke.Longitude = transform_from_wgs_to_gcj(Location(poke.Latitude, poke.Longitude))
-            newpokemons.append([poke.pokemon.PokemonId, label, poke.Latitude, poke.Longitude])
-
-
-        #This deletes the old pokemons
-        pokemons = newpokemons
+            pokemons.append([poke.pokemon.PokemonId, label, poke.Latitude, poke.Longitude])
 
         #Avoid same gym displayed more than once
         gymseen = set([])
