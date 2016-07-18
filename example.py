@@ -422,7 +422,7 @@ def main():
                                 if args.china:
                                     Fort.Latitude, Fort.Longitude = transform_from_wgs_to_gcj(Location(Fort.Latitude, Fort.Longitude))
                                 if Fort.GymPoints:
-                                    gyms.append([Fort.Team, Fort.Latitude, Fort.Longitude])
+                                    gyms.insert(0,[Fort.Team, Fort.Latitude, Fort.Longitude])
                                 elif Fort.FortType:
                                     pokestops.append([Fort.Latitude, Fort.Longitude])
             except AttributeError:
@@ -444,11 +444,11 @@ def main():
         gymseen = set([])
         for gym in gyms:
             gymhash = str(gym[1]) + ',' + str(gym[2])
-            if (hash in gymseen):
+            if (gymhash in gymseen):
                 gyms.remove(gym)
             else:
                 gymseen.add(gymhash)
-        
+
         #Scan location math
         if (-steplimit/2 < x <= steplimit/2) and (-steplimit/2 < y <= steplimit/2):
             set_location_coords((x * 0.0025) + deflat, (y * 0.0025 ) + deflng, 0)
